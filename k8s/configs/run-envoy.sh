@@ -1,13 +1,14 @@
 #!/bin/sh
+set -e
 
-ENVOY_BIN=/usr/local/bin/envoy
-CONFIG=/etc/envoy/envoy.yaml
-BASE_ID=0
+BASE_ID=1
+SOCKET_PATH=/tmp/envoy-restart.sock
 
-exec $ENVOY_BIN \
-  -c $CONFIG \
-  --restart-epoch 0 \
+exec envoy \
+  --config-path /etc/envoy/envoy.yaml \
+  --restart-epoch ${RESTART_EPOCH:-0} \
   --base-id $BASE_ID \
-  --log-level info \
-  --disable-hot-restart=false
+  --parent-shutdown-time-s 5 \
+  --drain-time-s 5 \
+  --log-level info
 

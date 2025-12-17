@@ -17,27 +17,19 @@ static_resources:
             - name: backend_services
               domains: ["*"]
               routes:
-              # 🔹 Details service
-              - match:
-                  prefix: "/info"
-                route:
-                  cluster: details_service
-
-              # 🔹 Canary routing for pinger
               - match:
                   prefix: "/"
                 route:
                   weighted_clusters:
                     clusters:
                     - name: pinger_v1
-                      weight: 10
+                      weight: 95
                     - name: pinger_v2
-                      weight: 90
+                      weight: 5
           http_filters:
           - name: envoy.filters.http.router
 
   clusters:
-  # 🔹 Pinger v1
   - name: pinger_v1
     connect_timeout: 5s
     type: STRICT_DNS
@@ -49,10 +41,9 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: pinger-v1-service.default.svc.cluster.local
+                address: pinger-v1
                 port_value: 3000
 
-  # 🔹 Pinger v2
   - name: pinger_v2
     connect_timeout: 5s
     type: STRICT_DNS
@@ -64,23 +55,8 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: pinger-v2-service.default.svc.cluster.local
+                address: pinger-v2
                 port_value: 3000
-
-  # 🔹 Details service
-  - name: details_service
-    connect_timeout: 5s
-    type: STRICT_DNS
-    lb_policy: ROUND_ROBIN
-    load_assignment:
-      cluster_name: details_service
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: details-service.default.svc.cluster.local
-                port_value: 4000
 
 admin:
   address:
