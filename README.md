@@ -1,4 +1,4 @@
-# K8s Learnathon // Kubernetes and Microservices
+# Kubernetes and Microservices
 Simple microservice boilerplate.
 
 ## Description
